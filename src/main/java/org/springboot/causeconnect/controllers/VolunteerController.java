@@ -1,9 +1,6 @@
 package org.springboot.causeconnect.controllers;
 
-import org.springboot.causeconnect.DTO.EditVolunteerDto;
-import org.springboot.causeconnect.DTO.JoinEventRequestDto;
-import org.springboot.causeconnect.DTO.OTPDto;
-import org.springboot.causeconnect.DTO.VerifyOtpDto;
+import org.springboot.causeconnect.DTO.*;
 import org.springboot.causeconnect.entities.Event;
 import org.springboot.causeconnect.entities.Volunteer;
 import org.springboot.causeconnect.services.EmailService;
@@ -30,7 +27,7 @@ public class VolunteerController {
     @Autowired
     private EmailService emailService;
 
-        @GetMapping("/SendOtp")
+        @PostMapping("/SendOtp")
         public ResponseEntity<ApiResponse> sendOtp(@RequestBody OTPDto otpDto) throws ApiException {
             try {
                 int OtpId=this.emailService.generateAndSendVolunteerOtp(otpDto.getEmail());
@@ -40,7 +37,7 @@ public class VolunteerController {
             }
         }
 
-        @GetMapping("/VerifyOtp")
+        @PostMapping("/VerifyOtp")
         public ResponseEntity<ApiResponse> verifyOtp(@RequestBody VerifyOtpDto verifyOtpDto) throws ApiException {
             try {
                 boolean isVerified=this.emailService.verifyEmail(verifyOtpDto.getId(),verifyOtpDto.getOtp());
@@ -93,7 +90,7 @@ public class VolunteerController {
         }
 
         @GetMapping("")
-        public ResponseEntity<ApiResponse> checkVolunteer(@RequestHeader("VolunteerEmail") String email,@RequestHeader("VolunteerPassword")String password) {
+        public ResponseEntity<ApiResponse> checkVolunteer(@RequestHeader("email") String email,@RequestHeader("password")String password) {
             try{
                 boolean isPresent=this.volunteerService.checkIfVolunteerExists(email,password);
                 return ResponseEntity.status(200).body(new ApiResponse(200, isPresent, "Volunteer Access successful"));
@@ -149,7 +146,7 @@ public class VolunteerController {
     @GetMapping("/All")
     public ResponseEntity<ApiResponse> getAllVolunteer() throws ApiException {
             try {
-                List<Volunteer> volunteerList=this.volunteerService.getAllVolunteers();
+                List<VolunteerDetailsDto> volunteerList=this.volunteerService.getAllVolunteers();
                 return ResponseEntity.status(200).body(new ApiResponse(200,volunteerList,"Volunteers fetched successfully"));
             }catch (ApiException e){
                 return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),null,e.getMessage()));

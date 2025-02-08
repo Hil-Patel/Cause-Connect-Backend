@@ -1,14 +1,19 @@
 package org.springboot.causeconnect.services;
 import lombok.extern.slf4j.Slf4j;
-import org.springboot.causeconnect.DTO.LoginNgoDto;
+import org.springboot.causeconnect.DTO.*;
+import org.springboot.causeconnect.entities.Event;
+import org.springboot.causeconnect.entities.FileSystem;
 import org.springboot.causeconnect.entities.NGO;
+import org.springboot.causeconnect.entities.Owner;
 import org.springboot.causeconnect.repository.NGORepository;
 import org.springboot.causeconnect.utilities.ApiException;
+import org.springboot.causeconnect.utilities.ByteArrayMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -75,12 +80,45 @@ public class NGOService {
         return ngo.get();
     }
 
-    public NGO geNGOById(int id) throws ApiException {
+    public NGOProfileDataToNgoDto geNGOById(int id) throws ApiException {
         Optional<NGO> optionalNGO = this.ngoRepository.findById(id);
         if(optionalNGO.isEmpty()) {
             throw new ApiException("NGO does not exist",404);
         }
-        return optionalNGO.get();
+        NGO getNGO = optionalNGO.get();
+        return mapToNGOProfileDataToNgoDto(getNGO);
+    }
+    private NGOProfileDataToNgoDto mapToNGOProfileDataToNgoDto(NGO ngo){
+        NGOProfileDataToNgoDto dto = new NGOProfileDataToNgoDto();
+
+        dto.setId(ngo.getId());
+        dto.setNgoName(ngo.getNgoName());
+        dto.setNgoAim(ngo.getNgoAim());
+        dto.setNgoDescription(ngo.getNgoDescription());
+        dto.setEmail(ngo.getEmail());
+        dto.setPhoneNumber(ngo.getPhoneNumber());
+        dto.setAddress(ngo.getAddress());
+        dto.setNumberOfMember(ngo.getNumberOfMember());
+        dto.setCity(ngo.getCity());
+        dto.setAccountNumber(ngo.getAccountNumber());
+        dto.setPassword(ngo.getPassword());
+        dto.setOwner(ngo.getOwner());
+        dto.setCompletedEvents(ngo.getCompletedEvents());
+        dto.setPendingFutureEvents(ngo.getPendingFutureEvents());
+
+        FileSystem fileSystem = ngo.getFileSystem();
+        if (fileSystem != null) {
+            FileSystemDto fileSystemDto = new FileSystemDto();
+            int ngoId = ngo.getId();
+
+            fileSystemDto.setBankStatementUrl("/api/v1/files/" + ngoId + "/bankStatement");
+            fileSystemDto.setTranscriptUrl("/api/v1/files/" + ngoId + "/transcript");
+            dto.setProfilePicUrl("/api/v1/files/" + ngoId + "/profilePic");
+
+            dto.setFileSystemDto(fileSystemDto);
+        }
+
+        return dto;
     }
 
     public List<NGO> getAllNGOsByCity(String city) throws ApiException {
@@ -107,11 +145,74 @@ public class NGOService {
         return ngos;
     }
 
-    public List<NGO> getAllNgoUnapproved() {
-        return this.ngoRepository.findNGOByisApprovedFalse();
+    public List<NGOUnApprovedDetailsDTO> getAllNgoUnapproved() {
+        List<NGO> unapprovedNgos = this.ngoRepository.findNGOByisApprovedFalse();
+        return unapprovedNgos.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+    private NGOUnApprovedDetailsDTO mapToDTO(NGO ngo) {
+        NGOUnApprovedDetailsDTO dto = new NGOUnApprovedDetailsDTO();
+
+        dto.setId(ngo.getId());
+        dto.setNgoName(ngo.getNgoName());
+        dto.setNgoAim(ngo.getNgoAim());
+        dto.setNgoDescription(ngo.getNgoDescription());
+        dto.setEmail(ngo.getEmail());
+        dto.setPhoneNumber(ngo.getPhoneNumber());
+        dto.setAddress(ngo.getAddress());
+        dto.setNumberOfMember(ngo.getNumberOfMember());
+        dto.setCity(ngo.getCity());
+        dto.setAccountNumber(ngo.getAccountNumber());
+        dto.setOwner(ngo.getOwner());
+
+        // Convert FileSystem to FileSystemDto
+        FileSystem fileSystem = ngo.getFileSystem();
+        if (fileSystem != null) {
+            FileSystemDto fileSystemDto = new FileSystemDto();
+            int ngoId = ngo.getId();
+
+            fileSystemDto.setBankStatementUrl("/api/v1/files/" + ngoId + "/bankStatement");
+            fileSystemDto.setTranscriptUrl("/api/v1/files/" + ngoId + "/transcript");
+            dto.setProfilePicUrl("/api/v1/files/" + ngoId + "/profilePic");
+
+            dto.setFileSystemDto(fileSystemDto);
+        }
+
+        return dto;
     }
 
-    public List<NGO> getAllNgoApproved() {
-        return this.ngoRepository.findNGOByisApprovedTrue();
+    public List<AdminFetchApprovedNgoDto> getAllNgoApproved() {
+        List<NGO> approvedNGO= this.ngoRepository.findNGOByisApprovedTrue();
+        return approvedNGO.stream().map(this::mapApprovedNgoToDto).collect(Collectors.toList());
+    }
+    private AdminFetchApprovedNgoDto mapApprovedNgoToDto(NGO ngo) {
+        AdminFetchApprovedNgoDto dto = new AdminFetchApprovedNgoDto();
+
+        dto.setId(ngo.getId());
+        dto.setNgoName(ngo.getNgoName());
+        dto.setNgoAim(ngo.getNgoAim());
+        dto.setNgoDescription(ngo.getNgoDescription());
+        dto.setEmail(ngo.getEmail());
+        dto.setPhoneNumber(ngo.getPhoneNumber());
+        dto.setAddress(ngo.getAddress());
+        dto.setNumberOfMember(ngo.getNumberOfMember());
+        dto.setCity(ngo.getCity());
+        dto.setAccountNumber(ngo.getAccountNumber());
+        dto.setOwner(ngo.getOwner());
+        dto.setCompletedEvents(ngo.getCompletedEvents());
+        dto.setPendingFutureEvents(ngo.getPendingFutureEvents());
+
+        FileSystem fileSystem = ngo.getFileSystem();
+        if (fileSystem != null) {
+            FileSystemDto fileSystemDto = new FileSystemDto();
+            int ngoId = ngo.getId();
+
+            fileSystemDto.setBankStatementUrl("/api/v1/files/" + ngoId + "/bankStatement");
+            fileSystemDto.setTranscriptUrl("/api/v1/files/" + ngoId + "/transcript");
+            dto.setProfilePic("/api/v1/files/" + ngoId + "/profilePic");
+
+            dto.setFileSystemDto(fileSystemDto);
+        }
+
+        return dto;
     }
 }

@@ -9,10 +9,27 @@ public class EventVolunteer {
     private int id;
 
     private String task;
+    @OneToOne
+    private Volunteer volunteer;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
+
+    public EventVolunteer(int id, String task, Volunteer volunteer, Event event) {
+        this.id = id;
+        this.task = task;
+        this.volunteer = volunteer;
+        this.event = event;
+    }
+
+    public Volunteer getVolunteer() {
+        return volunteer;
+    }
+
+    public void setVolunteer(Volunteer volunteer) {
+        this.volunteer = volunteer;
+    }
 
     public Event getEvent() {
         return event;
@@ -26,11 +43,7 @@ public class EventVolunteer {
     public EventVolunteer() {
     }
 
-    public EventVolunteer(int id, Event event, String task) {
-        this.id = id;
-        this.event = event;
-        this.task = task;
-    }
+
 
     public int getId() {
         return id;

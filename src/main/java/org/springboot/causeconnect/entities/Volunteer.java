@@ -14,6 +14,7 @@ public class Volunteer {
     String email;
     String phoneNumber;
     int age;
+    String gender;
     String address;
     String city;
     String experience;
@@ -36,12 +37,13 @@ public class Volunteer {
     public Volunteer() {
     }
 
-    public Volunteer(int id, String fullName, String email, String phoneNumber, int age, String address, String city, String experience, String password, List<Event> eventsRequestList, List<EventVolunteer> pastEvents, List<EventVolunteer> upcomingEvents) {
+    public Volunteer(int id, String fullName, String email, String phoneNumber, int age, String gender, String address, String city, String experience, String password, List<Event> eventsRequestList, List<EventVolunteer> pastEvents, List<EventVolunteer> upcomingEvents) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.age = age;
+        this.gender = gender;
         this.address = address;
         this.city = city;
         this.experience = experience;
@@ -49,6 +51,14 @@ public class Volunteer {
         this.eventsRequestList = eventsRequestList;
         this.pastEvents = pastEvents;
         this.upcomingEvents = upcomingEvents;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public List<Event> getEventsRequestList() {

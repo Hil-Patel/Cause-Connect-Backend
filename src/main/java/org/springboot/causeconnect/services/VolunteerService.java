@@ -1,12 +1,14 @@
 package org.springboot.causeconnect.services;
 
 import org.springboot.causeconnect.DTO.EditVolunteerDto;
+import org.springboot.causeconnect.DTO.VolunteerDetailsDto;
 import org.springboot.causeconnect.entities.Volunteer;
 import org.springboot.causeconnect.repository.VolunteerRepository;
 import org.springboot.causeconnect.utilities.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,9 +45,23 @@ public class VolunteerService {
         return volunteer;
     }
 
-    public List<Volunteer> getAllVolunteers() throws ApiException {
+    public List<VolunteerDetailsDto> getAllVolunteers() throws ApiException {
         List<Volunteer> volunteers = volunteerRepository.findAll();
-        return volunteers;
+        List<VolunteerDetailsDto> volunteerDetailsDtoList=new ArrayList<>();
+        volunteers.forEach(volunteer -> {
+            VolunteerDetailsDto volunteerDetailsDto = new VolunteerDetailsDto();
+            volunteerDetailsDto.setId(volunteer.getId());
+            volunteerDetailsDto.setEmail(volunteer.getEmail());
+            volunteerDetailsDto.setGender(volunteer.getGender());
+            volunteerDetailsDto.setName(volunteer.getFullName());
+            volunteerDetailsDto.setExperience(volunteer.getExperience());
+            volunteerDetailsDto.setAddress(volunteer.getAddress());
+            volunteerDetailsDto.setPhone(volunteer.getPhoneNumber());
+            volunteerDetailsDto.setAge(volunteer.getAge());
+            volunteerDetailsDto.setCity(volunteer.getCity());
+            volunteerDetailsDtoList.add(volunteerDetailsDto);
+        });
+        return volunteerDetailsDtoList;
     }
 
     public Volunteer getVolunteerByEmail(String email) throws ApiException {

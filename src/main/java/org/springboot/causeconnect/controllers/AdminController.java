@@ -1,7 +1,8 @@
 package org.springboot.causeconnect.controllers;
 
 import org.springboot.causeconnect.DTO.AdminDto;
-import org.springboot.causeconnect.DTO.ApproveAndDisapproveNgoDto;
+import org.springboot.causeconnect.DTO.AdminFetchApprovedNgoDto;
+import org.springboot.causeconnect.DTO.NGOUnApprovedDetailsDTO;
 import org.springboot.causeconnect.entities.NGO;
 import org.springboot.causeconnect.services.EmailService;
 import org.springboot.causeconnect.services.NGOService;
@@ -41,20 +42,20 @@ public class AdminController {
 
     @GetMapping("/UnapprovedNgo")
     public ResponseEntity<ApiResponse> UnapprovedNgo() {
-        List<NGO> ngos=this.ngoService.getAllNgoUnapproved();
+        List<NGOUnApprovedDetailsDTO> ngos=this.ngoService.getAllNgoUnapproved();
         return ResponseEntity.status(200).body(new ApiResponse(200,ngos,"UnapprovedNgo fetch successfully"));
     }
 
     @GetMapping("/ApprovedNgo")
     public ResponseEntity<ApiResponse> ApprovedNgo() {
-        List<NGO> ngos=this.ngoService.getAllNgoApproved();
+        List<AdminFetchApprovedNgoDto> ngos=this.ngoService.getAllNgoApproved();
         return ResponseEntity.status(200).body(new ApiResponse(200,ngos,"ApprovedNgo fetch successfully"));
     }
 
-    @GetMapping("/Disapprove/Ngo")
-    public ResponseEntity<ApiResponse> DisapproveNgo(@RequestBody ApproveAndDisapproveNgoDto approveAndDisapproveNgoDto) {
+    @GetMapping("/Disapprove/Ngo/{id}")
+    public ResponseEntity<ApiResponse> DisapproveNgo(@PathVariable int id) {
         try {
-            NGO ngo=this.ngoService.DisapproveNGO(approveAndDisapproveNgoDto.getId());
+            NGO ngo=this.ngoService.DisapproveNGO(id);
             this.emailService.sendNgoDisapprovalEmail(ngo.getEmail(),ngo.getOwner().getFullName());
             return ResponseEntity.status(200).body(new ApiResponse(200,null,"Disapproved Ngo Deleted successfully"));
 
@@ -63,10 +64,11 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/Approve/Ngo")
-    public ResponseEntity<ApiResponse> ApproveNgo(@RequestBody ApproveAndDisapproveNgoDto approveNgo) throws ApiException {
+    @GetMapping("/Approve/Ngo/{id}")
+    public ResponseEntity<ApiResponse> ApproveNgo(@PathVariable int id) throws ApiException {
         try {
-            NGO ngo=this.ngoService.ApproveNGO(approveNgo.getId());
+            System.out.println(id);
+            NGO ngo=this.ngoService.ApproveNGO(id);
             this.emailService.sendNgoApprovalEmail(ngo.getEmail(),ngo.getOwner().getFullName());
             return ResponseEntity.status(200).body(new ApiResponse(200,null,"Ngo Approved successfully"));
 

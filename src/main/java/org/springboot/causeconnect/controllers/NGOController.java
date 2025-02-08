@@ -96,14 +96,14 @@ public class NGOController {
     @GetMapping("/profile/{id}")
     public ResponseEntity<ApiResponse> profile( @RequestHeader("NGOEmail") String email, @RequestHeader("NGOPassword") String password, @PathVariable int id){
         try {
-            NGO ngo=this.ngoService.geNGOById(id);
+            NGOProfileDataToNgoDto ngo=this.ngoService.geNGOById(id);
             if (ngo.getEmail().equals(email) && ngo.getPassword().equals(password)){
                 ngo.setPassword(null);
             }
             else {
                 ngo.setOwner(null);
-                ngo.getFileSystem().setTranscript(null);
-                ngo.getFileSystem().setBankStatement(null);
+                ngo.getFileSystemDto().setTranscriptUrl("");
+                ngo.getFileSystemDto().setBankStatementUrl("");
                 ngo.setPassword(null);
             }
             return ResponseEntity.status(200).body(new ApiResponse(200, ngo, "NGO profile Fetch successful"));
