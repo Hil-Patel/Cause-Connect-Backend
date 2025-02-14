@@ -1,5 +1,7 @@
 package org.springboot.causeconnect.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,16 +30,13 @@ public class Volunteer {
     )
     private List<Event> eventsRequestList;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<EventVolunteer> pastEvents;
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<EventVolunteer> upcomingEvents;
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<EventVolunteer> Events;
 
     public Volunteer() {
     }
 
-    public Volunteer(int id, String fullName, String email, String phoneNumber, int age, String gender, String address, String city, String experience, String password, List<Event> eventsRequestList, List<EventVolunteer> pastEvents, List<EventVolunteer> upcomingEvents) {
+    public Volunteer(int id, String fullName, String email, String phoneNumber, int age, String gender, String address, String city, String experience, String password, List<Event> eventsRequestList, List<EventVolunteer> events) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -49,8 +48,15 @@ public class Volunteer {
         this.experience = experience;
         this.password = password;
         this.eventsRequestList = eventsRequestList;
-        this.pastEvents = pastEvents;
-        this.upcomingEvents = upcomingEvents;
+        Events = events;
+    }
+
+    public List<EventVolunteer> getEvents() {
+        return Events;
+    }
+
+    public void setEvents(List<EventVolunteer> events) {
+        Events = events;
     }
 
     public String getGender() {
@@ -67,22 +73,6 @@ public class Volunteer {
 
     public void setEventsRequestList(List<Event> eventsRequestList) {
         this.eventsRequestList = eventsRequestList;
-    }
-
-    public List<EventVolunteer> getPastEvents() {
-        return pastEvents;
-    }
-
-    public void setPastEvents(List<EventVolunteer> pastEvents) {
-        this.pastEvents = pastEvents;
-    }
-
-    public List<EventVolunteer> getUpcomingEvents() {
-        return upcomingEvents;
-    }
-
-    public void setUpcomingEvents(List<EventVolunteer> upcomingEvents) {
-        this.upcomingEvents = upcomingEvents;
     }
 
     public String getCity() {

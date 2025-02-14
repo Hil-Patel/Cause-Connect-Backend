@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -93,10 +96,10 @@ public class NGOController {
     }
 
     //for ngo dashboard
-    @GetMapping("/profile/{id}")
-    public ResponseEntity<ApiResponse> profile( @RequestHeader("NGOEmail") String email, @RequestHeader("NGOPassword") String password, @PathVariable int id){
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse> profile( @RequestHeader("email") String email, @RequestHeader("password") String password){
         try {
-            NGOProfileDataToNgoDto ngo=this.ngoService.geNGOById(id);
+            NGOProfileDataToNgoDto ngo=this.ngoService.geNGOByEmail(email);
             if (ngo.getEmail().equals(email) && ngo.getPassword().equals(password)){
                 ngo.setPassword(null);
             }
@@ -106,6 +109,7 @@ public class NGOController {
                 ngo.getFileSystemDto().setBankStatementUrl("");
                 ngo.setPassword(null);
             }
+            System.out.println(ngo);
             return ResponseEntity.status(200).body(new ApiResponse(200, ngo, "NGO profile Fetch successful"));
 
         }catch (ApiException e){
@@ -129,7 +133,7 @@ public class NGOController {
     public ResponseEntity<ApiResponse> CheckNgoAccess(@RequestHeader("email") String email, @RequestHeader("password") String password){
         try {
             NGO ngo=this.ngoService.checkNGO(email,password);
-            return ResponseEntity.status(200).body(new ApiResponse(200, true, "NGO Access successful"));
+            return ResponseEntity.status(200).body(new ApiResponse(200, ngo.getId(), "NGO Access successful"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
         }
@@ -152,11 +156,44 @@ public class NGOController {
         }
     }
 
+    private Date parseDateString(String dateStr) {
+        if (dateStr == null || dateStr.isEmpty()) {
+            // Handle the null or empty string case
+            return null;  // Or throw an exception or return a default value
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        try {
+            return sdf.parse(dateStr);
+        } catch (ParseException e) {
+            // Handle exception, maybe log it or return a default value
+            return null;  // Or throw a custom exception to indicate invalid date format
+        }
+    }
+
     @PostMapping("/CreateEvent")
-    public ResponseEntity<ApiResponse> CreateEvent(@RequestBody CreateEventDto createEventDto){
-        Event event=this.modelMapper.map(createEventDto, Event.class);
-        int id=this.eventService.addEvent(event);
-        return ResponseEntity.status(200).body(new ApiResponse(200, id, "Event created successfully"));
+    public ResponseEntity<ApiResponse> CreateEvent(@RequestHeader("email") String email, @RequestHeader("password") String password,@RequestBody CreateEventDto createEventDto) throws ApiException {
+        try {
+            Event event=this.modelMapper.map(createEventDto, Event.class);
+//            if (createEventDto.getEventDate() != null && !createEventDto.getEventDate().isEmpty()) {
+//            }
+//
+//            if (createEventDto.getLastDateToRegister() != null && !createEventDto.getLastDateToRegister().isEmpty()) {
+//            }
+//            event.setEventDate(null);
+//            event.setLastDateToRegister(null);
+
+            NGO ngo=this.ngoService.getNGO(email);
+            if (!ngo.getEmail().equals(email) && !ngo.getPassword().equals(password)){
+                throw new ApiException("Unauthorized access", 401);
+            }
+            event.setHost(ngo);
+            event.setStatus("UPCOMING");
+            int id=this.eventService.addEvent(event);
+            return ResponseEntity.status(200).body(new ApiResponse(200, id, "Event created successfully"));
+        }catch (ApiException e){
+            return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
+        }
     }
 
     @GetMapping("/EventCompleted/{id}")
@@ -179,7 +216,7 @@ public class NGOController {
     public ResponseEntity<ApiResponse> getUpcomingEvents(@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
         try {
             NGO ngo=this.ngoService.getNGO(email);
-            return ResponseEntity.status(200).body(new ApiResponse(200, ngo.getPendingFutureEvents(), "NGO Fetched successful"));
+            return ResponseEntity.status(200).body(new ApiResponse(200, null, "NGO Fetched successful"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
         }
@@ -189,7 +226,7 @@ public class NGOController {
     public ResponseEntity<ApiResponse> getPastEvents(@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
         try {
             NGO ngo=this.ngoService.getNGO(email);
-            return ResponseEntity.status(200).body(new ApiResponse(200, ngo.getCompletedEvents(), "NGO Fetched successful"));
+            return ResponseEntity.status(200).body(new ApiResponse(200,null, "NGO Fetched successful"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
         }
@@ -200,7 +237,7 @@ public class NGOController {
         try {
             Event event=this.eventService.deleteEvent(deleteEvent.getId());
             this.emailService.sendEventCancellationNotification(event, deleteEvent.getReason());
-            return ResponseEntity.status(200).body(new ApiResponse(200, event.getId(), "Event deleted successfully"));
+            return ResponseEntity.status(200).body(new ApiResponse(200, event.getEvent_id(), "Event deleted successfully"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
         }

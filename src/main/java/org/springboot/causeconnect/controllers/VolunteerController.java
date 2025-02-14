@@ -136,7 +136,7 @@ public class VolunteerController {
     public ResponseEntity<ApiResponse> getUpcomingEvent(@PathVariable int id) throws ApiException {
             try {
                 Volunteer volunteer = this.volunteerService.getVolunteerById(id);
-                return ResponseEntity.status(200).body(new ApiResponse(200,volunteer.getUpcomingEvents(),"Upcoming events fetched successfully"));
+                return ResponseEntity.status(200).body(new ApiResponse(200,volunteer.getEvents(),"Upcoming events fetched successfully"));
 
             }catch (ApiException e){
                 return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),null,e.getMessage()));

@@ -7,10 +7,10 @@ import org.springboot.causeconnect.entities.NGO;
 import org.springboot.causeconnect.entities.Owner;
 import org.springboot.causeconnect.repository.NGORepository;
 import org.springboot.causeconnect.utilities.ApiException;
-import org.springboot.causeconnect.utilities.ByteArrayMultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
 public class NGOService {
     @Autowired
     private NGORepository ngoRepository;
+
+    public void updateNGO(NGO ngo) {
+        ngoRepository.save(ngo);
+    }
 
     public void registerNGO(NGO ngo) throws ApiException {
         if (ngoRepository.existsByEmail(ngo.getEmail())) {
@@ -80,8 +84,8 @@ public class NGOService {
         return ngo.get();
     }
 
-    public NGOProfileDataToNgoDto geNGOById(int id) throws ApiException {
-        Optional<NGO> optionalNGO = this.ngoRepository.findById(id);
+    public NGOProfileDataToNgoDto geNGOByEmail(String email) throws ApiException {
+        Optional<NGO> optionalNGO = this.ngoRepository.findByEmail(email);
         if(optionalNGO.isEmpty()) {
             throw new ApiException("NGO does not exist",404);
         }
@@ -103,8 +107,23 @@ public class NGOService {
         dto.setAccountNumber(ngo.getAccountNumber());
         dto.setPassword(ngo.getPassword());
         dto.setOwner(ngo.getOwner());
-        dto.setCompletedEvents(ngo.getCompletedEvents());
-        dto.setPendingFutureEvents(ngo.getPendingFutureEvents());
+
+        List<Event>  completedEvents = new ArrayList<>();
+        List<Event> pendingFutureEvents= new ArrayList<>();
+
+//        ngo.getEvents().forEach(event -> {
+//            if (event.getStatus().equals("UPCOMING")) {
+//                completedEvents.add(event);
+//            }
+//            else {
+//                pendingFutureEvents.add(event);
+//            }
+//        });
+        Event event=new Event();
+        completedEvents.add(event);
+
+        dto.setCompletedEvents(completedEvents);
+        dto.setPendingFutureEvents(pendingFutureEvents);
 
         FileSystem fileSystem = ngo.getFileSystem();
         if (fileSystem != null) {
@@ -198,8 +217,21 @@ public class NGOService {
         dto.setCity(ngo.getCity());
         dto.setAccountNumber(ngo.getAccountNumber());
         dto.setOwner(ngo.getOwner());
-        dto.setCompletedEvents(ngo.getCompletedEvents());
-        dto.setPendingFutureEvents(ngo.getPendingFutureEvents());
+        List<Event>  completedEvents = new ArrayList<>();
+        List<Event> pendingFutureEvents= new ArrayList<>();
+
+        ngo.getEvents().forEach(event -> {
+            if (event.getStatus().equals("UPCOMING")) {
+                completedEvents.add(event);
+            }
+            else {
+                pendingFutureEvents.add(event);
+            }
+        });
+
+        dto.setCompletedEvents(completedEvents);
+        dto.setPendingFutureEvents(pendingFutureEvents);
+
 
         FileSystem fileSystem = ngo.getFileSystem();
         if (fileSystem != null) {

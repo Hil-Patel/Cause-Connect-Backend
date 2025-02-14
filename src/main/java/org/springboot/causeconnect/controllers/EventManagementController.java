@@ -65,7 +65,7 @@ public class EventManagementController {
             event.getEventVolunteer().add(savedEventVolunteer);
 
             volunteer.getEventsRequestList().remove(event);
-            List<EventVolunteer> eventVolunteers=volunteer.getUpcomingEvents();
+            List<EventVolunteer> eventVolunteers=volunteer.getEvents();
             eventVolunteers.add(savedEventVolunteer);
             Volunteer updatedVolunteer=this.volunteerService.saveVolunteer(volunteer);
 

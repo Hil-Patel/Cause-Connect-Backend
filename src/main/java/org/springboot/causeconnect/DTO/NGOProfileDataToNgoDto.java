@@ -19,6 +19,7 @@ public class NGOProfileDataToNgoDto {
     int accountNumber;
     private String profilePicUrl;
     Owner owner;
+    // List
     List<Event> completedEvents;
     List<Event> pendingFutureEvents;
     FileSystemDto fileSystemDto;

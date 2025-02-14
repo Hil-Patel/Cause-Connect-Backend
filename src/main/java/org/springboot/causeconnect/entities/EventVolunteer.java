@@ -1,5 +1,7 @@
 package org.springboot.causeconnect.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -9,18 +11,32 @@ public class EventVolunteer {
     private int id;
 
     private String task;
+
+    private String status;
+
     @OneToOne
+    @JsonIgnoreProperties("Events")
     private Volunteer volunteer;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
+    @JsonIgnoreProperties("eventVolunteer")
     private Event event;
 
-    public EventVolunteer(int id, String task, Volunteer volunteer, Event event) {
+    public EventVolunteer(int id, String task, String status, Volunteer volunteer, Event event) {
         this.id = id;
         this.task = task;
+        this.status = status;
         this.volunteer = volunteer;
         this.event = event;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Volunteer getVolunteer() {

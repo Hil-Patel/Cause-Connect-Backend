@@ -34,14 +34,12 @@ public class FileController {
                 break;
             case "profilePic":
                 fileData = ngo.getFileSystem().getProfilePic();
-                contentType = "image/jpg"; // Or image/png based on the file
+                contentType = "image/jpg";
                 break;
             default:
                 throw new RuntimeException("Invalid file type");
         }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(fileData);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).body(fileData);
     }
 }

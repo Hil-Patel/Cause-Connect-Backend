@@ -1,6 +1,7 @@
 package org.springboot.causeconnect.services;
 
 import org.springboot.causeconnect.entities.Event;
+import org.springboot.causeconnect.entities.EventVolunteer;
 import org.springboot.causeconnect.entities.Volunteer;
 import org.springboot.causeconnect.repository.EventRepository;
 import org.springboot.causeconnect.utilities.ApiException;
@@ -23,19 +24,20 @@ public class EventService {
     private TaskScheduler taskScheduler;
 
     public int addEvent(Event event) {
-        event.setStatus("UPCOMING");
+        System.out.println(event.getEventDate());
+        System.out.println(event.getLastDateToRegister());
         this.eventRepository.save(event);
-        taskScheduler.schedule(()->{
-            this.eventRepository.delete(event);
-        },triggerContext -> {
-            return event.getLastDateToRegister().toInstant();
-        });
-        return event.getId();
+//        taskScheduler.schedule(()->{
+//            this.eventRepository.delete(event);
+//        },triggerContext -> {
+//            return event.getLastDateToRegister().toInstant();
+//        });
+        return event.getEvent_id();
     }
 
     public int updateEvent(Event event) {
         eventRepository.save(event);
-        return event.getId();
+        return event.getEvent_id();
     }
 
     public Event getEvent(int id) throws ApiException {

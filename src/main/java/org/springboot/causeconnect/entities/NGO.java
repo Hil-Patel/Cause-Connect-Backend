@@ -1,5 +1,6 @@
 package org.springboot.causeconnect.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -25,17 +26,15 @@ public class NGO {
 
     @OneToOne(cascade = CascadeType.ALL)
     FileSystem fileSystem;
+    // Make a single list of events
+    @OneToMany(mappedBy = "Host", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    List<Event> events;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    List<Event> completedEvents;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    List<Event> pendingFutureEvents;
 
     public NGO() {
     }
 
-    public NGO(int id, String ngoName, String ngoAim, String ngoDescription, String email, String phoneNumber, String address, int numberOfMember, String city, int accountNumber, String password, boolean isApproved, Owner owner, FileSystem fileSystem, List<Event> completedEvents, List<Event> pendingFutureEvents) {
+    public NGO(int id, String ngoName, String ngoAim, String ngoDescription, String email, String phoneNumber, String address, int numberOfMember, String city, int accountNumber, String password, boolean isApproved, Owner owner, FileSystem fileSystem, List<Event> events) {
         this.id = id;
         this.ngoName = ngoName;
         this.ngoAim = ngoAim;
@@ -50,24 +49,15 @@ public class NGO {
         this.isApproved = isApproved;
         this.owner = owner;
         this.fileSystem = fileSystem;
-        this.completedEvents = completedEvents;
-        this.pendingFutureEvents = pendingFutureEvents;
+        this.events = events;
     }
 
-    public List<Event> getCompletedEvents() {
-        return completedEvents;
+    public List<Event> getEvents() {
+        return events;
     }
 
-    public void setCompletedEvents(List<Event> completedEvents) {
-        this.completedEvents = completedEvents;
-    }
-
-    public List<Event> getPendingFutureEvents() {
-        return pendingFutureEvents;
-    }
-
-    public void setPendingFutureEvents(List<Event> pendingFutureEvents) {
-        this.pendingFutureEvents = pendingFutureEvents;
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 
     public boolean isApproved() {

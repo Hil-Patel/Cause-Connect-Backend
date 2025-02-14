@@ -1,6 +1,6 @@
 package org.springboot.causeconnect.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -8,9 +8,8 @@ import java.util.List;
 
 @Entity
 public class Event {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int event_id;
     private String name;
     private String Description;
     private String address;
@@ -18,22 +17,24 @@ public class Event {
     private String Status;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private Date lastDateToRegister;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
     private Date EventDate;
 
-    @OneToOne
+    @ManyToOne
+    @JsonIgnoreProperties("event")
     private NGO Host;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "event_volunteer_requests",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "volunteer_id")
     )
+    @JsonIgnoreProperties("eventsRequestList") // Make a single list of events
     private List<Volunteer> volunteerRequestList;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -42,8 +43,8 @@ public class Event {
     public Event() {
     }
 
-    public Event(int id, String name, String description, String address, String city, String status, Date lastDateToRegister, Date eventDate, NGO host, List<Volunteer> volunteerRequestList, List<EventVolunteer> eventVolunteer) {
-        this.id = id;
+    public Event(int event_id, String name, String description, String address, String city, String status, Date lastDateToRegister, Date eventDate, NGO host, List<Volunteer> volunteerRequestList, List<EventVolunteer> eventVolunteer) {
+        this.event_id = event_id;
         this.name = name;
         Description = description;
         this.address = address;
@@ -56,12 +57,12 @@ public class Event {
         this.eventVolunteer = eventVolunteer;
     }
 
-    public int getId() {
-        return id;
+    public int getEvent_id() {
+        return event_id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setEvent_id(int event_id) {
+        this.event_id = event_id;
     }
 
     public String getName() {

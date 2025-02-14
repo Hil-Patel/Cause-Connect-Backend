@@ -9,22 +9,20 @@ public class CreateEventDto {
     private String Description;
     private String address;
     private String city;
-    private Date lastDateToRegister;
-    private Date EventDate;
+    private String lastDateToRegister;
+    private String EventDate;
 
-    private NGO Host;
 
     public CreateEventDto() {
     }
 
-    public CreateEventDto(String name, String description, String address, String city, Date lastDateToRegister, Date eventDate, NGO host) {
+    public CreateEventDto(String name, String description, String address, String city, String lastDateToRegister, String eventDate, NGO host) {
         this.name = name;
         Description = description;
         this.address = address;
         this.city = city;
         this.lastDateToRegister = lastDateToRegister;
         EventDate = eventDate;
-        Host = host;
     }
 
     public String getName() {
@@ -59,27 +57,20 @@ public class CreateEventDto {
         this.city = city;
     }
 
-    public Date getLastDateToRegister() {
+    public String getLastDateToRegister() {
         return lastDateToRegister;
     }
 
-    public void setLastDateToRegister(Date lastDateToRegister) {
+    public void setLastDateToRegister(String lastDateToRegister) {
         this.lastDateToRegister = lastDateToRegister;
     }
 
-    public Date getEventDate() {
+    public String getEventDate() {
         return EventDate;
     }
 
-    public void setEventDate(Date eventDate) {
+    public void setEventDate(String eventDate) {
         EventDate = eventDate;
     }
 
-    public NGO getHost() {
-        return Host;
-    }
-
-    public void setHost(NGO host) {
-        Host = host;
-    }
 }
