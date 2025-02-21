@@ -3,11 +3,11 @@ package org.springboot.causeconnect.DTO;
 public class JoinEventRequestDto {
     private int eventId;
 
-    public JoinEventRequestDto() {
+    public JoinEventRequestDto(int eventId) {
+        this.eventId = eventId;
     }
 
-    public JoinEventRequestDto(int eventId, int volunteerId) {
-        this.eventId = eventId;
+    public JoinEventRequestDto() {
     }
 
     public int getEventId() {
@@ -17,5 +17,4 @@ public class JoinEventRequestDto {
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }
-
 }

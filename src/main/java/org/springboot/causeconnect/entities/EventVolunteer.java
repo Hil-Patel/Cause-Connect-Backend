@@ -15,12 +15,10 @@ public class EventVolunteer {
     private String status;
 
     @OneToOne
-    @JsonIgnoreProperties("Events")
     private Volunteer volunteer;
 
     @ManyToOne
     @JoinColumn(name = "event_id")
-    @JsonIgnoreProperties("eventVolunteer")
     private Event event;
 
     public EventVolunteer(int id, String task, String status, Volunteer volunteer, Event event) {

@@ -3,30 +3,28 @@ package org.springboot.causeconnect.entities;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 public class Event {
-    @Id@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int event_id;
     private String name;
-    private String Description;
+    private String description; // Changed to lowercase
     private String address;
     private String city;
-    private String Status;
+    private String status;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
-    private Date lastDateToRegister;
+    private LocalDateTime lastDateToRegister;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm")
-    private Date EventDate;
+    private LocalDateTime eventDate;
 
     @ManyToOne
-    @JsonIgnoreProperties("event")
-    private NGO Host;
+    private NGO host;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -34,7 +32,7 @@ public class Event {
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "volunteer_id")
     )
-    @JsonIgnoreProperties("eventsRequestList") // Make a single list of events
+    @JsonIgnoreProperties("eventsRequestList")
     private List<Volunteer> volunteerRequestList;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -43,16 +41,16 @@ public class Event {
     public Event() {
     }
 
-    public Event(int event_id, String name, String description, String address, String city, String status, Date lastDateToRegister, Date eventDate, NGO host, List<Volunteer> volunteerRequestList, List<EventVolunteer> eventVolunteer) {
+    public Event(int event_id, String name, String description, String address, String city, String status, LocalDateTime lastDateToRegister, LocalDateTime eventDate, NGO host, List<Volunteer> volunteerRequestList, List<EventVolunteer> eventVolunteer) {
         this.event_id = event_id;
         this.name = name;
-        Description = description;
+        this.description = description;
         this.address = address;
         this.city = city;
-        Status = status;
+        this.status = status;
         this.lastDateToRegister = lastDateToRegister;
-        EventDate = eventDate;
-        Host = host;
+        this.eventDate = eventDate;
+        this.host = host;
         this.volunteerRequestList = volunteerRequestList;
         this.eventVolunteer = eventVolunteer;
     }
@@ -74,11 +72,11 @@ public class Event {
     }
 
     public String getDescription() {
-        return Description;
+        return description; // Updated getter
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description; // Updated setter
     }
 
     public String getAddress() {
@@ -98,35 +96,35 @@ public class Event {
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(String status) {
-        Status = status;
+        this.status = status;
     }
 
-    public Date getLastDateToRegister() {
+    public LocalDateTime getLastDateToRegister() {
         return lastDateToRegister;
     }
 
-    public void setLastDateToRegister(Date lastDateToRegister) {
+    public void setLastDateToRegister(LocalDateTime lastDateToRegister) {
         this.lastDateToRegister = lastDateToRegister;
     }
 
-    public Date getEventDate() {
-        return EventDate;
+    public LocalDateTime getEventDate() {
+        return eventDate;
     }
 
-    public void setEventDate(Date eventDate) {
-        EventDate = eventDate;
+    public void setEventDate(LocalDateTime eventDate) {
+        this.eventDate = eventDate;
     }
 
     public NGO getHost() {
-        return Host;
+        return host;
     }
 
     public void setHost(NGO host) {
-        Host = host;
+        this.host = host;
     }
 
     public List<Volunteer> getVolunteerRequestList() {

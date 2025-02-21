@@ -20,6 +20,7 @@ public class Volunteer {
     String address;
     String city;
     String experience;
+    @JsonIgnore
     String password;
 
     @ManyToMany

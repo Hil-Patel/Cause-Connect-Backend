@@ -1,5 +1,6 @@
 package org.springboot.causeconnect.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springboot.causeconnect.DTO.*;
 import org.springboot.causeconnect.entities.Event;
 import org.springboot.causeconnect.entities.Volunteer;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,6 +28,9 @@ public class VolunteerController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    ModelMapper modelMapper;
 
         @PostMapping("/SendOtp")
         public ResponseEntity<ApiResponse> sendOtp(@RequestBody OTPDto otpDto) throws ApiException {
@@ -49,9 +54,11 @@ public class VolunteerController {
         }
 
         @PostMapping("/registerVolunteer")
-        public ResponseEntity<ApiResponse> registerVolunteer(@RequestBody Volunteer volunteer){
+        public ResponseEntity<ApiResponse> registerVolunteer(@RequestBody RegisterVolunteerDto volunteer){
             try{
-                Volunteer registeredVolunteer =  volunteerService.registerVolunteer(volunteer);
+                Volunteer v=this.modelMapper.map(volunteer,Volunteer.class);
+                System.out.println(v.getEmail());
+                Volunteer registeredVolunteer =  volunteerService.registerVolunteer(v);
                 return ResponseEntity.ok().body(new ApiResponse(201,true,"Volunteer registered successfully"));
             }catch (ApiException e){
                     return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),false,e.getMessage()));
@@ -59,9 +66,11 @@ public class VolunteerController {
         }
 
         @PostMapping("/loginVolunteer")
-        public ResponseEntity<ApiResponse> loginVolunteer(@RequestBody Volunteer volunteer){
+        public ResponseEntity<ApiResponse> loginVolunteer(@RequestBody LoginNgoDto volunteer){
             try{
+                System.out.println(volunteer.getPassword());
                 Boolean isLoggedVolunteer = this.volunteerService.loginVolunteer(volunteer);
+                System.out.println(isLoggedVolunteer);
                 return ResponseEntity.status(200).body(new ApiResponse(200,isLoggedVolunteer,"Volunteer loggedIn Successfully..."));
             }catch (ApiException e){
                 return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),false,e.getMessage()));
@@ -93,17 +102,28 @@ public class VolunteerController {
         public ResponseEntity<ApiResponse> checkVolunteer(@RequestHeader("email") String email,@RequestHeader("password")String password) {
             try{
                 boolean isPresent=this.volunteerService.checkIfVolunteerExists(email,password);
-                return ResponseEntity.status(200).body(new ApiResponse(200, isPresent, "Volunteer Access successful"));
+                if (!isPresent){
+                    throw new ApiException("Volunteer not found",404);
+                }
+                Volunteer volunteer=this.volunteerService.getVolunteerByEmail(email);
+                return ResponseEntity.status(200).body(new ApiResponse(200, volunteer.getId(), "Volunteer Access successful"));
             }catch (ApiException e){
                 return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),null, "unauthorised access"));
             }
         }
 
         @GetMapping("/Events")
-        public ResponseEntity<ApiResponse> getAllEvent() throws ApiException {
+        public ResponseEntity<ApiResponse> getAllEvent(@RequestHeader("email") String email,@RequestHeader("password")String password) throws ApiException {
             try {
-            List<Event> allEvent=this.eventService.getAllEvents();
-            return ResponseEntity.status(200).body(new ApiResponse(200,allEvent,"Events Fetched successfully"));
+                List<Event> allEvent=this.eventService.getAllUpcomingEvents();
+                Volunteer volunteer=this.volunteerService.getVolunteerByEmail(email);
+                List<Event> response = new ArrayList<>();
+                allEvent.forEach(event->{
+                    if (!volunteer.getEventsRequestList().contains(event)){
+                        response.add(event);
+                    }
+                });
+                return ResponseEntity.status(200).body(new ApiResponse(200,response,"Events Fetched successfully"));
             }catch (ApiException e){
                 return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),null,e.getMessage()));
             }
@@ -120,12 +140,12 @@ public class VolunteerController {
         }
 
     @PostMapping("/JoinRequest")
-    public ResponseEntity<ApiResponse> requestToJoinEvent(@RequestBody JoinEventRequestDto joinEventRequestDto, @RequestHeader("VolunteerEmail") String email, @RequestHeader("VolunteerPassword")String password) throws ApiException {
+    public ResponseEntity<ApiResponse> requestToJoinEvent(@RequestHeader("email") String email, @RequestHeader("password") String password,@RequestBody JoinEventRequestDto joinEventRequestDto) throws ApiException {
         try {
             Event event=this.eventService.getEvent(joinEventRequestDto.getEventId());
             Volunteer volunteer=this.volunteerService.getVolunteerByEmail(email);
             event.getVolunteerRequestList().add(volunteer);
-            volunteer.getEventsRequestList().add(event);
+            int id=this.eventService.updateEvent(event);
             return ResponseEntity.status(200).body(new ApiResponse(200,true,"Request sent successfully"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),null,e.getMessage()));

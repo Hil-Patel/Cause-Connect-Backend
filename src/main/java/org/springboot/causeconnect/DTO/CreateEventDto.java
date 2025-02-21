@@ -1,28 +1,25 @@
 package org.springboot.causeconnect.DTO;
 
-import org.springboot.causeconnect.entities.NGO;
-
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class CreateEventDto {
     private String name;
-    private String Description;
+    private String description; // Changed to lowercase
     private String address;
     private String city;
     private String lastDateToRegister;
-    private String EventDate;
-
+    private String eventDate;
 
     public CreateEventDto() {
     }
 
-    public CreateEventDto(String name, String description, String address, String city, String lastDateToRegister, String eventDate, NGO host) {
+    public CreateEventDto(String name, String description, String address, String city, String lastDateToRegister, String eventDate) {
         this.name = name;
-        Description = description;
+        this.description = description;
         this.address = address;
         this.city = city;
         this.lastDateToRegister = lastDateToRegister;
-        EventDate = eventDate;
+        this.eventDate = eventDate;
     }
 
     public String getName() {
@@ -34,11 +31,11 @@ public class CreateEventDto {
     }
 
     public String getDescription() {
-        return Description;
+        return description; // Updated getter
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description; // Updated setter
     }
 
     public String getAddress() {
@@ -66,11 +63,10 @@ public class CreateEventDto {
     }
 
     public String getEventDate() {
-        return EventDate;
+        return eventDate;
     }
 
     public void setEventDate(String eventDate) {
-        EventDate = eventDate;
+        this.eventDate = eventDate;
     }
-
 }

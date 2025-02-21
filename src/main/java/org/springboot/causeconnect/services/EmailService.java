@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -178,7 +179,7 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public String createVolunteerAcceptedEmailBody(String volunteerName, String ngoName, String eventName, Date eventDate, String eventLocation, String assignedTask) {
+    public String createVolunteerAcceptedEmailBody(String volunteerName, String ngoName, String eventName, LocalDateTime eventDate, String eventLocation, String assignedTask) {
         // Format the Date to a readable string (e.g., "March 5, 2025")
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
         String formattedDate = dateFormat.format(eventDate);

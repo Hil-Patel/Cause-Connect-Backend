@@ -1,5 +1,6 @@
 package org.springboot.causeconnect.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -19,15 +20,18 @@ public class NGO {
     int numberOfMember;
     String city;
     int accountNumber;
+    @JsonIgnore
     String password;
     boolean isApproved;
     @OneToOne(cascade = CascadeType.ALL)
     Owner owner;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
     FileSystem fileSystem;
     // Make a single list of events
-    @OneToMany(mappedBy = "Host", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "host", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+    @JsonIgnore
     List<Event> events;
 
 

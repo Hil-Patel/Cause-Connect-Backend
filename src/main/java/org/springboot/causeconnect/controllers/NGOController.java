@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -109,7 +111,6 @@ public class NGOController {
                 ngo.getFileSystemDto().setBankStatementUrl("");
                 ngo.setPassword(null);
             }
-            System.out.println(ngo);
             return ResponseEntity.status(200).body(new ApiResponse(200, ngo, "NGO profile Fetch successful"));
 
         }catch (ApiException e){
@@ -156,33 +157,18 @@ public class NGOController {
         }
     }
 
-    private Date parseDateString(String dateStr) {
-        if (dateStr == null || dateStr.isEmpty()) {
-            // Handle the null or empty string case
-            return null;  // Or throw an exception or return a default value
-        }
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-        try {
-            return sdf.parse(dateStr);
-        } catch (ParseException e) {
-            // Handle exception, maybe log it or return a default value
-            return null;  // Or throw a custom exception to indicate invalid date format
-        }
-    }
 
     @PostMapping("/CreateEvent")
     public ResponseEntity<ApiResponse> CreateEvent(@RequestHeader("email") String email, @RequestHeader("password") String password,@RequestBody CreateEventDto createEventDto) throws ApiException {
         try {
             Event event=this.modelMapper.map(createEventDto, Event.class);
-//            if (createEventDto.getEventDate() != null && !createEventDto.getEventDate().isEmpty()) {
-//            }
-//
-//            if (createEventDto.getLastDateToRegister() != null && !createEventDto.getLastDateToRegister().isEmpty()) {
-//            }
-//            event.setEventDate(null);
-//            event.setLastDateToRegister(null);
-
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            if (createEventDto.getLastDateToRegister() != null && !createEventDto.getLastDateToRegister().isEmpty()) {
+                event.setLastDateToRegister(LocalDateTime.parse(createEventDto.getLastDateToRegister(), formatter));
+            }
+            if (createEventDto.getEventDate() != null && !createEventDto.getEventDate().isEmpty()) {
+                event.setEventDate(LocalDateTime.parse(createEventDto.getEventDate(), formatter));
+            }
             NGO ngo=this.ngoService.getNGO(email);
             if (!ngo.getEmail().equals(email) && !ngo.getPassword().equals(password)){
                 throw new ApiException("Unauthorized access", 401);
@@ -196,41 +182,58 @@ public class NGOController {
         }
     }
 
-    @GetMapping("/EventCompleted/{id}")
-    public ResponseEntity<ApiResponse> getEventCompleted(@PathVariable int id,@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
+    //manually complete an event
+//    @GetMapping("/EventCompleted/{id}")
+//    public ResponseEntity<ApiResponse> getEventCompleted(@PathVariable int id,@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
+//        try {
+//            NGO ngo=this.ngoService.checkNGO(email,password);
+//            Event event=this.eventService.getEvent(id);
+//            if (ngo != event.getHost()){
+//                throw new ApiException("Unauthorised access",401);
+//            }
+//            event.setStatus("COMPLETED");
+//            int eventId=this.eventService.updateEvent(event);
+//            return ResponseEntity.status(200).body(new ApiResponse(200, eventId, "Event completed successfully"));
+//        }catch (ApiException e){
+//            return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
+//        }
+//    }
+
+    @GetMapping("/UpcomingEvent/{id}")
+    public ResponseEntity<ApiResponse> getUpcomingEvents(@PathVariable int id ,@RequestHeader("email") String email, @RequestHeader("password") String password){
         try {
-            NGO ngo=this.ngoService.checkNGO(email,password);
-            Event event=this.eventService.getEvent(id);
-            if (ngo != event.getHost()){
-                throw new ApiException("Unauthorised access",401);
+            NGO ngo=this.ngoService.getNGO(email);
+            Event event=null;
+            List<Event> e=ngo.getEvents();
+            for (Event value : e) {
+                if (value.getEvent_id() == id) {
+                    event = value;
+                }
             }
-            event.setStatus("COMPLETED");
-            int eventId=this.eventService.updateEvent(event);
-            return ResponseEntity.status(200).body(new ApiResponse(200, eventId, "Event completed successfully"));
+            if (event==null){
+                throw new ApiException("Event not found", 404);
+            }
+            event.setHost(null);
+//            if(event.getHost()!=ngo){
+//                event.getHost().setOwner(null);
+//                event.setVolunteerRequestList(null);
+//                event.setEventVolunteer(null);
+//            }
+            return ResponseEntity.status(200).body(new ApiResponse(200, event, "Event Fetched successful"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
         }
     }
 
-    @GetMapping("/UpcomingEvent")
-    public ResponseEntity<ApiResponse> getUpcomingEvents(@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
-        try {
-            NGO ngo=this.ngoService.getNGO(email);
-            return ResponseEntity.status(200).body(new ApiResponse(200, null, "NGO Fetched successful"));
-        }catch (ApiException e){
-            return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
-        }
-    }
-
-    @GetMapping("/CompletedEvent")
-    public ResponseEntity<ApiResponse> getPastEvents(@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
-        try {
-            NGO ngo=this.ngoService.getNGO(email);
-            return ResponseEntity.status(200).body(new ApiResponse(200,null, "NGO Fetched successful"));
-        }catch (ApiException e){
-            return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
-        }
-    }
+//    @GetMapping("/CompletedEvent")
+//    public ResponseEntity<ApiResponse> getPastEvents(@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password){
+//        try {
+//            NGO ngo=this.ngoService.getNGO(email);
+//            return ResponseEntity.status(200).body(new ApiResponse(200,null, "NGO Fetched successful"));
+//        }catch (ApiException e){
+//            return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
+//        }
+//    }
 
     @DeleteMapping("/Event")
     public ResponseEntity<ApiResponse> deleteEvent(@RequestBody DeleteEvent deleteEvent){

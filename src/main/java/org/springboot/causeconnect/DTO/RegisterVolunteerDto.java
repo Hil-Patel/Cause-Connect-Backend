@@ -1,61 +1,47 @@
 package org.springboot.causeconnect.DTO;
 
-public class VolunteerDetailsDto {
-    int id;
+public class RegisterVolunteerDto {
     String fullName;
-    String phone;
+    String phoneNumber;
     String address;
     String city;
     String email;
     int age;
     String gender;
     String experience;
+    String password;
+    String confirmPassword;
 
-    public VolunteerDetailsDto() {
+    public RegisterVolunteerDto() {
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public VolunteerDetailsDto(int id, String fullName, String phone, String address, String city, String email, int age, String gender, String experience) {
-        this.id = id;
+    public RegisterVolunteerDto(String fullName, String phoneNumber, String address, String city, String email, int age, String gender, String experience, String password, String confirmPassword) {
         this.fullName = fullName;
-        this.phone = phone;
+        this.phoneNumber = phoneNumber;
         this.address = address;
         this.city = city;
         this.email = email;
         this.age = age;
         this.gender = gender;
         this.experience = experience;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
+    public String getFullName() {
         return fullName;
     }
 
-    public void setName(String fullName) {
+    public void setFullName(String fullName) {
         this.fullName = fullName;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getAddress() {
@@ -64,6 +50,14 @@ public class VolunteerDetailsDto {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getEmail() {
@@ -96,5 +90,21 @@ public class VolunteerDetailsDto {
 
     public void setExperience(String experience) {
         this.experience = experience;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 }

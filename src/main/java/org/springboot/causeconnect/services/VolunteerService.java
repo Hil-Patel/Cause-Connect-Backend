@@ -1,6 +1,7 @@
 package org.springboot.causeconnect.services;
 
 import org.springboot.causeconnect.DTO.EditVolunteerDto;
+import org.springboot.causeconnect.DTO.LoginNgoDto;
 import org.springboot.causeconnect.DTO.VolunteerDetailsDto;
 import org.springboot.causeconnect.entities.Volunteer;
 import org.springboot.causeconnect.repository.VolunteerRepository;
@@ -24,9 +25,10 @@ public class VolunteerService {
         return this.volunteerRepository.save(volunteer);
     }
 
-    public boolean loginVolunteer(Volunteer volunteer) throws ApiException {
+    public boolean loginVolunteer(LoginNgoDto volunteer) throws ApiException {
         Optional<Volunteer> volunteer1 =  this.volunteerRepository.findByEmail(volunteer.getEmail());
-        if(!volunteer1.isPresent()) {
+        System.out.println(volunteer1.isEmpty());
+        if(volunteer1.isEmpty()) {
             throw new ApiException("Volunteer not found...",404);
         }
         Volunteer volunteer2 = volunteer1.get();
@@ -40,9 +42,14 @@ public class VolunteerService {
         if(volunteerRepository.findById(id).isEmpty()) {
             throw new ApiException("Volunteer not found...",404);
         }
-        Volunteer volunteer = volunteerRepository.findById(id).get();
-        volunteer.setPassword(null);
-        return volunteer;
+        Volunteer v = volunteerRepository.findById(id).get();
+        v.setPassword(null);
+        v.getEventsRequestList().forEach(event ->{
+            event.setEventVolunteer(null);
+            event.setHost(null);
+            event.setVolunteerRequestList(null);
+        } );
+        return v;
     }
 
     public List<VolunteerDetailsDto> getAllVolunteers() throws ApiException {
@@ -69,7 +76,6 @@ public class VolunteerService {
             throw new ApiException("Volunteer not found...",404);
         }
         Volunteer volunteer = volunteerRepository.findByEmail(email).get();
-        volunteer.setPassword(null);
         return volunteer;
     }
 

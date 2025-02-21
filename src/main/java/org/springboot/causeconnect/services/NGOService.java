@@ -111,16 +111,18 @@ public class NGOService {
         List<Event>  completedEvents = new ArrayList<>();
         List<Event> pendingFutureEvents= new ArrayList<>();
 
-//        ngo.getEvents().forEach(event -> {
-//            if (event.getStatus().equals("UPCOMING")) {
-//                completedEvents.add(event);
-//            }
-//            else {
-//                pendingFutureEvents.add(event);
-//            }
-//        });
-        Event event=new Event();
-        completedEvents.add(event);
+        ngo.getEvents().forEach(event -> {
+            if (event.getStatus().equals("UPCOMING")) {
+                pendingFutureEvents.add(event);
+            }
+            else {
+                completedEvents.add(event);
+            }
+            event.setHost(null);
+        });
+//        Event event=new Event();
+//        completedEvents.add(event);
+//        System.out.println();
 
         dto.setCompletedEvents(completedEvents);
         dto.setPendingFutureEvents(pendingFutureEvents);
