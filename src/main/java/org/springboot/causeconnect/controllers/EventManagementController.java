@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,35 +46,53 @@ public class EventManagementController {
         }
     }
 
-    @GetMapping("/Ngo/AssignTask")
-    public ResponseEntity<ApiResponse> getAssignTask(@RequestHeader("NgoEmail") String email, @RequestHeader("NgoPassword") String password, @RequestBody EventTaskAssignDto eventTaskAssignDto){
+    @PostMapping("/Ngo/AssignTask")
+    public ResponseEntity<ApiResponse> getAssignTask(@RequestHeader("email") String email, @RequestHeader("password") String password, @RequestBody EventTaskAssignDto eventTaskAssignDto){
         try {
             NGO ngo=this.ngoService.checkNGO(email,password);
             Event event=this.eventService.getEvent(eventTaskAssignDto.getEventId());
             if(event.getHost()!=ngo){
                 throw new ApiException("Unauthorized access",401);
             }
-            Volunteer volunteer=this.volunteerService.getVolunteerById(eventTaskAssignDto.getVolunteerId());
+
+//            List<Volunteer> requestList=event.getVolunteerRequestList();
+//            List<EventVolunteer> eventVolunteers=event.getEventVolunteer();
+
+            Volunteer volunteer=this.volunteerService.getVolunteerByEmail(eventTaskAssignDto.getVolunteerEmail());
+
 
             EventVolunteer eventVolunteer=new EventVolunteer();
-            eventVolunteer.setEvent(event);
             eventVolunteer.setTask(eventTaskAssignDto.getTask());
 
-            EventVolunteer savedEventVolunteer=this.eventVolunteerService.saveEventVolunteer(eventVolunteer);
-
             event.getVolunteerRequestList().remove(volunteer);
-            event.getEventVolunteer().add(savedEventVolunteer);
-
+            event.getEventVolunteer().add(eventVolunteer);
             volunteer.getEventsRequestList().remove(event);
-            List<EventVolunteer> eventVolunteers=volunteer.getEvents();
-            eventVolunteers.add(savedEventVolunteer);
+            volunteer.getEvents().add(eventVolunteer);
+
+//            requestList.remove(volunteer);
+//            event.setVolunteerRequestList(requestList);
+//            eventVolunteers.add(eventVolunteer);
+//            event.setEventVolunteer(eventVolunteers);
+//
+//
+//            List<Event> volEvent=volunteer.getEventsRequestList();
+//            List<EventVolunteer> evVolunteers=volunteer.getEvents();
+//            volEvent.remove(event);
+//            volunteer.setEventsRequestList(volEvent);
+//            evVolunteers.add(eventVolunteer);
+//            volunteer.setEvents(evVolunteers);
+
+//            eventVolunteer.setEvent(event);
+//            eventVolunteer.setVolunteer(volunteer);
+
             Volunteer updatedVolunteer=this.volunteerService.saveVolunteer(volunteer);
+            int eventId=this.eventService.updateEvent(event);
 
-            String body=this.emailService.createVolunteerAcceptedEmailBody(volunteer.getFullName(), ngo.getNgoName(), event.getName() ,event.getEventDate(),event.getAddress(),savedEventVolunteer.getTask());
-            String subject = "Confirmation of Your Participation in the Event: " + event.getName();
-            this.emailService.sendEmail(volunteer.getEmail(), body, subject);
+//            String body=this.emailService.createVolunteerAcceptedEmailBody(volunteer.getFullName(), ngo.getNgoName(), event.getName() ,event.getEventDate(),event.getAddress(),eventVolunteer.getTask());
+//            String subject = "Confirmation of Your Participation in the Event: " + event.getName();
+//            this.emailService.sendEmail(volunteer.getEmail(), body, subject);
 
-            return ResponseEntity.status(200).body(new ApiResponse(200,true,"Task assigned"));
+            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Task assigned"));
 
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));

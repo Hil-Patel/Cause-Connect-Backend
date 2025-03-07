@@ -26,7 +26,7 @@ public class Event {
     @ManyToOne
     private NGO host;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "event_volunteer_requests",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -36,6 +36,7 @@ public class Event {
     private List<Volunteer> volunteerRequestList;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("event")
     private List<EventVolunteer> eventVolunteer;
 
     public Event() {

@@ -12,30 +12,22 @@ public class EventVolunteer {
 
     private String task;
 
-    private String status;
 
-    @OneToOne
+    @ManyToOne
+    @JsonIgnoreProperties("eventVolunteers")
     private Volunteer volunteer;
 
     @ManyToOne
-    @JoinColumn(name = "event_id")
+    @JsonIgnoreProperties("assignedEvents")
     private Event event;
 
-    public EventVolunteer(int id, String task, String status, Volunteer volunteer, Event event) {
+    public EventVolunteer(int id, String task, Volunteer volunteer, Event event) {
         this.id = id;
         this.task = task;
-        this.status = status;
         this.volunteer = volunteer;
         this.event = event;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public Volunteer getVolunteer() {
         return volunteer;

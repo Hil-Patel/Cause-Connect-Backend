@@ -2,6 +2,7 @@ package org.springboot.causeconnect.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,15 +24,12 @@ public class Volunteer {
     @JsonIgnore
     String password;
 
-    @ManyToMany
-    @JoinTable(
-            name = "event_volunteer_requests",
-            joinColumns = @JoinColumn(name = "volunteer_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+    @ManyToMany(mappedBy = "volunteerRequestList")
+    @JsonIgnoreProperties("volunteerRequestList")
     private List<Event> eventsRequestList;
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("volunteer")
     private List<EventVolunteer> Events;
 
     public Volunteer() {

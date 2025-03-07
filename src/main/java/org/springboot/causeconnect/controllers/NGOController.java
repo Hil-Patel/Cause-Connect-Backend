@@ -68,7 +68,7 @@ public class NGOController {
     public ResponseEntity<ApiResponse> registerNgo(RegisterNgoDTO registerNgoDTO) {
         try{
             NGO ngo     = this.modelMapper.map(registerNgoDTO, NGO.class);
-            ngo.setApproved(false);
+            ngo.setApproved(true);
 
             Owner owner = this.modelMapper.map(registerNgoDTO, Owner.class);
             ngo.setOwner(owner);

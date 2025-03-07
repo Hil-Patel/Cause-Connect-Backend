@@ -1,40 +1,40 @@
 package org.springboot.causeconnect.DTO;
 
 public class EventTaskAssignDto {
-    private int VolunteerId;
-    private int EventId;
-    private String Task;
+    private String volunteerEmail;
+    private int eventId;
+    private String task;
 
     public EventTaskAssignDto() {
     }
 
-    public EventTaskAssignDto(int volunteerId, int eventId, String task) {
-        VolunteerId = volunteerId;
-        EventId = eventId;
-        Task = task;
+    public EventTaskAssignDto(String volunteerEmail, String task, int eventId) {
+        this.volunteerEmail = volunteerEmail;
+        this.task = task;
+        this.eventId = eventId;
     }
 
-    public int getVolunteerId() {
-        return VolunteerId;
+    public String getVolunteerEmail() {
+        return volunteerEmail;
     }
 
-    public void setVolunteerId(int volunteerId) {
-        VolunteerId = volunteerId;
-    }
-
-    public int getEventId() {
-        return EventId;
-    }
-
-    public void setEventId(int eventId) {
-        EventId = eventId;
+    public void setVolunteerEmail(String volunteerEmail) {
+        this.volunteerEmail = volunteerEmail;
     }
 
     public String getTask() {
-        return Task;
+        return task;
     }
 
     public void setTask(String task) {
-        Task = task;
+        this.task = task;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
     }
 }
