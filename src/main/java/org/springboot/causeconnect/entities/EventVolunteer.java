@@ -14,11 +14,11 @@ public class EventVolunteer {
 
 
     @ManyToOne
-    @JsonIgnoreProperties("eventVolunteers")
+    @JsonIgnoreProperties("events")
     private Volunteer volunteer;
 
     @ManyToOne
-    @JsonIgnoreProperties("assignedEvents")
+    @JsonIgnoreProperties("eventVolunteer")
     private Event event;
 
     public EventVolunteer(int id, String task, Volunteer volunteer, Event event) {

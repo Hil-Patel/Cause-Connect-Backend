@@ -112,6 +112,20 @@ public class VolunteerController {
             }
         }
 
+    @GetMapping("/Dashboard")
+    public ResponseEntity<ApiResponse> volunteer(@RequestHeader("email") String email,@RequestHeader("password")String password) {
+        try{
+            boolean isPresent=this.volunteerService.checkIfVolunteerExists(email,password);
+            if (!isPresent){
+                throw new ApiException("Volunteer not found",404);
+            }
+            Volunteer volunteer=this.volunteerService.getVolunteerByEmail(email);
+            return ResponseEntity.status(200).body(new ApiResponse(200, volunteer, "Data Fetched Successfully"));
+        }catch (ApiException e){
+            return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(),null, "unauthorised access"));
+        }
+    }
+
         @GetMapping("/Events")
         public ResponseEntity<ApiResponse> getAllEvent(@RequestHeader("email") String email,@RequestHeader("password")String password) throws ApiException {
             try {
@@ -119,8 +133,12 @@ public class VolunteerController {
                 Volunteer volunteer=this.volunteerService.getVolunteerByEmail(email);
                 List<Event> response = new ArrayList<>();
                 allEvent.forEach(event->{
-                    if (!volunteer.getEventsRequestList().contains(event)){
-                        response.add(event);
+                    if (!volunteer.getEventsRequestList().contains(event) ){
+                        volunteer.getEvents().forEach(eventVolunteer -> {
+                            if (!eventVolunteer.getEvent().equals(event)){
+                                response.add(event);
+                            }
+                        });
                     }
                 });
                 return ResponseEntity.status(200).body(new ApiResponse(200,response,"Events Fetched successfully"));

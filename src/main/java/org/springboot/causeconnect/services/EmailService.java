@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -180,31 +181,50 @@ public class EmailService {
     }
 
     public String createVolunteerAcceptedEmailBody(String volunteerName, String ngoName, String eventName, LocalDateTime eventDate, String eventLocation, String assignedTask) {
-        // Format the Date to a readable string (e.g., "March 5, 2025")
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
-        String formattedDate = dateFormat.format(eventDate);
 
+        // Define the correct date format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy HH:mm");
+
+        // Format the date properly
+        String formattedDate = (eventDate != null) ? eventDate.format(formatter) : "Date not available";
+
+        // Construct the email body using StringBuilder
         StringBuilder body = new StringBuilder();
 
-        body.append("Dear ").append(volunteerName).append(",\n\n");
-        body.append("Your request to join the event \"")
-                .append(eventName)
-                .append("\" organized by ")
-                .append(ngoName)
-                .append(" has been approved.\n\n");
-        body.append("Below are the details of the event and your assigned task:\n");
-        body.append("Event Name: ").append(eventName).append("\n");
-        body.append("Date: ").append(formattedDate).append("\n");
-        body.append("Location: ").append(eventLocation).append("\n");
-        body.append("Assigned Task: ").append(assignedTask).append("\n\n");
-        body.append("We appreciate your contribution to this initiative. If you have any questions or require additional information, please do not hesitate to reach out to us.\n\n");
-        body.append("Thank you for your participation.\n\n");
-        body.append("Best regards,\n");
-        body.append(ngoName).append(" Team");
+        body.append("Dear ").append(volunteerName).append(",\n\n")
+                .append("Your request to join the event \"").append(eventName)
+                .append("\" organized by ").append(ngoName).append(" has been approved.\n\n")
+                .append("Below are the details of the event and your assigned task:\n")
+                .append("📅 Event Name: ").append(eventName).append("\n")
+                .append("🗓 Date & Time: ").append(formattedDate).append("\n")
+                .append("📍 Location: ").append(eventLocation).append("\n")
+                .append("📝 Assigned Task: ").append(assignedTask).append("\n\n")
+                .append("We appreciate your contribution to this initiative. If you have any questions or require additional information, please do not hesitate to reach out to us.\n\n")
+                .append("Thank you for your participation.\n\n")
+                .append("Best regards,\n")
+                .append(ngoName).append(" Team");
 
         return body.toString();
     }
 
+    public String createVolunteerDeclinedEmailBody(String volunteerName, String ngoName, String eventName, String reason) {
+
+        // Construct the email body using StringBuilder
+        StringBuilder body = new StringBuilder();
+
+        body.append("Dear ").append(volunteerName).append(",\n\n")
+                .append("Thank you for your interest in participating in the event \"").append(eventName)
+                .append("\" organized by ").append(ngoName).append(".\n\n")
+                .append("After careful consideration, we regret to inform you that your request to join the event has been declined.\n")
+                .append("Reason for decline: ").append(reason).append("\n\n")
+                .append("We truly appreciate your enthusiasm and willingness to contribute. We encourage you to stay connected for future opportunities where we can collaborate.\n\n")
+                .append("If you have any questions or would like to volunteer for other events, please feel free to reach out to us.\n\n")
+                .append("Thank you for your understanding.\n\n")
+                .append("Best regards,\n")
+                .append(ngoName).append(" Team");
+
+        return body.toString();
+    }
 
     private String buildEmailBody(Event event, String reason, Volunteer volunteer) {
         return String.format(
