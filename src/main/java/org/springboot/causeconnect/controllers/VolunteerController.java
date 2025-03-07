@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @RestController
 @RequestMapping("/api/v1/Volunteer")
@@ -133,12 +134,14 @@ public class VolunteerController {
                 Volunteer volunteer=this.volunteerService.getVolunteerByEmail(email);
                 List<Event> response = new ArrayList<>();
                 allEvent.forEach(event->{
-                    if (!volunteer.getEventsRequestList().contains(event) ){
-                        volunteer.getEvents().forEach(eventVolunteer -> {
-                            if (!eventVolunteer.getEvent().equals(event)){
-                                response.add(event);
-                            }
-                        });
+                    AtomicBoolean flag= new AtomicBoolean(true);
+                    volunteer.getEvents().forEach(eventVolunteer -> {
+                        if (eventVolunteer.getEvent().equals(event)){
+                            flag.set(false);
+                        }
+                    });
+                    if (!volunteer.getEventsRequestList().contains(event) && flag.get()){
+                        response.add(event);
                     }
                 });
                 return ResponseEntity.status(200).body(new ApiResponse(200,response,"Events Fetched successfully"));

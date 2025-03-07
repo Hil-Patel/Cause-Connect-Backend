@@ -102,7 +102,7 @@ public class EventManagementController {
             String subject = "Confirmation of Your Participation in the Event: " + event.getName();
             this.emailService.sendEmail(volunteer.getEmail(), body, subject);
 
-            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Task assigned"));
+            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Request Declined"));
 
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));

@@ -171,7 +171,7 @@ public class EmailService {
         }
     }
 
-    public void sendEmail(String to, String subject, String body) {
+    public void sendEmail(String to,String body, String subject) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
         message.setSubject(subject);
