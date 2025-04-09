@@ -20,6 +20,7 @@ public class Volunteer {
     String gender;
     String address;
     String city;
+    @Column(length = 1000)
     String experience;
     @JsonIgnore
     String password;

@@ -68,7 +68,7 @@ public class EventManagementController {
             String subject = "Your Participation Request for " + event.getName() + " Has Been Declined" ;
             this.emailService.sendEmail(volunteer.getEmail(), body, subject);
 
-            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Task assigned"));
+            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Request Declined"));
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));
         }
@@ -87,6 +87,7 @@ public class EventManagementController {
             EventVolunteer eventVolunteer=new EventVolunteer();
             eventVolunteer.setTask(eventTaskAssignDto.getTask());
 
+
             event.getVolunteerRequestList().remove(volunteer);
             event.getEventVolunteer().add(eventVolunteer);
             volunteer.getEventsRequestList().remove(event);
@@ -102,7 +103,7 @@ public class EventManagementController {
             String subject = "Confirmation of Your Participation in the Event: " + event.getName();
             this.emailService.sendEmail(volunteer.getEmail(), body, subject);
 
-            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Request Declined"));
+            return ResponseEntity.status(200).body(new ApiResponse(200,event,"Task assigned"));
 
         }catch (ApiException e){
             return ResponseEntity.status(e.getStatusCode()).body(new ApiResponse(e.getStatusCode(), null, e.getMessage()));

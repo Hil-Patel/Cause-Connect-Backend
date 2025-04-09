@@ -13,6 +13,7 @@ public class NGO {
     int id;
     String ngoName;
     String ngoAim;
+    @Column(length = 1000)
     String ngoDescription;
     String email;
     String phoneNumber;

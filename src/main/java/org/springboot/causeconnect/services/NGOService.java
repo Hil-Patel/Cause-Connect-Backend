@@ -120,9 +120,6 @@ public class NGOService {
             }
             event.setHost(null);
         });
-//        Event event=new Event();
-//        completedEvents.add(event);
-//        System.out.println();
 
         dto.setCompletedEvents(completedEvents);
         dto.setPendingFutureEvents(pendingFutureEvents);

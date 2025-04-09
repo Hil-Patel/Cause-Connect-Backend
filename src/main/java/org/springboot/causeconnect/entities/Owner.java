@@ -12,6 +12,7 @@ public class Owner {
     String ownerPhoneNumber;
     int age;
     String gender;
+    @Column(length = 1000)
     String experience;
 
     public Owner() {
