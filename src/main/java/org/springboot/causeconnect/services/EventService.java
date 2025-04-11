@@ -48,7 +48,9 @@ public class EventService {
 
             // Mark event as completed
             event.setStatus("COMPLETED");
-            eventRepository.save(event);
+            Event e= eventRepository.findById(event.getEvent_id()).get();
+            e.setStatus("COMPLETED");
+            eventRepository.save(e);
             System.out.println("Event marked as COMPLETED: " + event.getName());
 
             // Cancel the scheduled task
